@@ -21,15 +21,22 @@ themeToggleBtn.addEventListener('click', () => {
 
 
 // ================================================================
-// MOBILE NAV OVERLAY  (completely separate from header)
+// MOBILE NAV OVERLAY  (visibility-based for smooth transition)
 // ================================================================
 const hamburger   = document.getElementById('hamburger');
 const navOverlay  = document.getElementById('mobile-nav-overlay');
 const mobLinks    = document.querySelectorAll('.mob-link');
 
+// Add "Tap to close" hint if not already in HTML
+if (!navOverlay.querySelector('.mob-close-hint')) {
+  const hint = document.createElement('p');
+  hint.className = 'mob-close-hint';
+  hint.textContent = 'Tap outside to close';
+  navOverlay.appendChild(hint);
+}
+
 function openMobileMenu() {
   navOverlay.classList.add('open');
-  navOverlay.setAttribute('aria-hidden', 'false');
   hamburger.classList.add('active');
   hamburger.setAttribute('aria-expanded', 'true');
   document.body.style.overflow = 'hidden';
@@ -37,7 +44,6 @@ function openMobileMenu() {
 
 function closeMobileMenu() {
   navOverlay.classList.remove('open');
-  navOverlay.setAttribute('aria-hidden', 'true');
   hamburger.classList.remove('active');
   hamburger.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
@@ -53,26 +59,35 @@ hamburger.addEventListener('click', (e) => {
   }
 });
 
-// Close + smooth scroll to section when any mobile nav link is clicked
+// Close + smooth scroll when mobile nav link tapped
+// Delay scroll by 520ms so the overlay fully closes first (matches 500ms CSS transition)
 mobLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
-    const targetId = link.getAttribute('href'); // e.g. "#projects"
+    const targetId = link.getAttribute('href');
+
+    // Flash the tapped link so user sees the selection
+    link.style.transition = 'background 0.2s, color 0.2s';
+    link.style.background  = 'rgba(220,20,60,0.25)';
+    link.style.color        = '#ffffff';
+
     closeMobileMenu();
 
-    // Wait for overlay to close, then scroll
+    // Navigate after overlay closes
     setTimeout(() => {
+      link.style.background = '';
+      link.style.color      = '';
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         const headerH = document.getElementById('header').offsetHeight;
         const top = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
         window.scrollTo({ top, behavior: 'smooth' });
       }
-    }, 320);
+    }, 520);
   });
 });
 
-// Close overlay when tapping outside the menu list
+// Close overlay when tapping its own background
 navOverlay.addEventListener('click', (e) => {
   if (e.target === navOverlay) closeMobileMenu();
 });
