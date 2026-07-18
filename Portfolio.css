@@ -10,6 +10,9 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  /* Kill the browser default blue tap flash on all mobile devices */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 /* ==========================================
