@@ -60,30 +60,47 @@ hamburger.addEventListener('click', (e) => {
 });
 
 // Close + smooth scroll when mobile nav link tapped
-// Delay scroll by 520ms so the overlay fully closes first (matches 500ms CSS transition)
+// Ripple plays first (200ms), overlay closes (500ms), then scroll begins
 mobLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
     e.preventDefault();
     const targetId = link.getAttribute('href');
+    const li = link.parentElement;
 
-    // Flash the tapped link so user sees the selection
-    link.style.transition = 'background 0.2s, color 0.2s';
-    link.style.background  = 'rgba(220,20,60,0.25)';
-    link.style.color        = '#ffffff';
+    // ---- 1. Ripple burst on the tapped item ----
+    const ripple = document.createElement('span');
+    ripple.className = 'mob-link-ripple';
+    // Position ripple at touch/click point relative to the li
+    const rect = li.getBoundingClientRect();
+    const cx = (e.clientX || rect.left + rect.width / 2) - rect.left;
+    const cy = (e.clientY || rect.top  + rect.height / 2) - rect.top;
+    ripple.style.left = cx + 'px';
+    ripple.style.top  = cy + 'px';
+    li.style.position = 'relative';
+    li.style.overflow = 'hidden';
+    li.appendChild(ripple);
+    // Clean up ripple element after animation
+    setTimeout(() => ripple.remove(), 700);
 
-    closeMobileMenu();
+    // ---- 2. Glow the link text ----
+    link.style.transition = 'color 0.2s, letter-spacing 0.2s';
+    link.style.color = '#fff';
+    link.style.letterSpacing = '0.18em';
 
-    // Navigate after overlay closes
+    // ---- 3. Close overlay (500ms transition) ----
+    setTimeout(() => closeMobileMenu(), 200);
+
+    // ---- 4. Smooth scroll after overlay is gone ----
     setTimeout(() => {
-      link.style.background = '';
-      link.style.color      = '';
+      link.style.color = '';
+      link.style.letterSpacing = '';
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         const headerH = document.getElementById('header').offsetHeight;
         const top = targetEl.getBoundingClientRect().top + window.scrollY - headerH;
         window.scrollTo({ top, behavior: 'smooth' });
       }
-    }, 520);
+    }, 720);
   });
 });
 
@@ -204,7 +221,7 @@ updateActiveNav();
 
 
 // ================================================================
-// SMOOTH SCROLL for desktop nav links (fallback polyfill)
+// SMOOTH SCROLL for desktop nav links
 // ================================================================
 desktopLinks.forEach((link) => {
   link.addEventListener('click', (e) => {
@@ -220,3 +237,57 @@ desktopLinks.forEach((link) => {
     }
   });
 });
+
+
+// ================================================================
+// MOBILE PROJECT CARDS — inject always-visible action buttons
+// ================================================================
+function injectMobileProjectButtons() {
+  // Only run on mobile widths
+  if (window.innerWidth > 767) return;
+
+  document.querySelectorAll('.project-card').forEach((card) => {
+    // Skip if already injected
+    if (card.querySelector('.project-mobile-actions')) return;
+
+    // Gather links from the hidden overlay
+    const overlayLinks = card.querySelectorAll('.project-links a.proj-btn');
+    if (!overlayLinks.length) return;
+
+    // Build the action strip
+    const strip = document.createElement('div');
+    strip.className = 'project-mobile-actions';
+
+    overlayLinks.forEach((origBtn) => {
+      const btn = document.createElement('a');
+      btn.href        = origBtn.href;
+      btn.target      = origBtn.target || '_blank';
+      btn.rel         = 'noopener noreferrer';
+      btn.textContent = origBtn.textContent.trim();
+      btn.className   = 'mob-proj-btn' + (origBtn.classList.contains('disabled') ? ' disabled' : '');
+      if (origBtn.classList.contains('disabled')) {
+        btn.removeAttribute('href');
+        btn.style.pointerEvents = 'none';
+      }
+      strip.appendChild(btn);
+    });
+
+    // Insert the strip right after the image wrapper
+    const imgWrap = card.querySelector('.project-img-wrap');
+    if (imgWrap && imgWrap.nextSibling) {
+      card.insertBefore(strip, imgWrap.nextSibling);
+    } else if (imgWrap) {
+      card.appendChild(strip);
+    }
+  });
+}
+
+// Run on load
+injectMobileProjectButtons();
+
+// Also re-run if window resizes into mobile range
+window.addEventListener('resize', () => {
+  if (window.innerWidth <= 767) {
+    injectMobileProjectButtons();
+  }
+}, { passive: true });

@@ -1087,7 +1087,7 @@ section:nth-child(even) { background-color: var(--section-bg-even); }
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.35s ease;
 }
 .project-card:hover .project-overlay { opacity: 1; }
 
@@ -1426,59 +1426,32 @@ section:nth-child(even) { background-color: var(--section-bg-even); }
   .hero-photo-wrapper {
     width: 220px;
     height: 220px;
-    order: -1;  /* photo above text */
+    order: -1;
   }
   .hero-photo { width: 200px; height: 200px; }
 
-  /* All hero text blocks centered */
   .hero-greeting { text-align: center; }
   .hero-name     { text-align: center; }
-  .hero-roles    {
-    justify-content: center;
-    text-align: center;
-  }
-  .hero-summary  {
-    text-align: center;
-    margin: 0 auto 28px;
-    max-width: 100%;
-  }
-  /* Buttons centered & stacked neatly */
-  .hero-actions {
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-  }
-  .btn-primary,
-  .btn-secondary {
-    width: 100%;
-    max-width: 280px;
-    text-align: center;
-  }
+  .hero-roles    { justify-content: center; text-align: center; }
+  .hero-summary  { text-align: center; margin: 0 auto 28px; max-width: 100%; }
+  .hero-actions  { justify-content: center; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
+  .btn-primary, .btn-secondary { width: 100%; max-width: 280px; text-align: center; }
 
   .section-title-left  { text-align: center; }
   .section-header-left { text-align: center; }
   .section-line-left   { margin: 14px auto 0; }
 
-  /* About section — center everything */
-  .about-wrapper    { flex-direction: column; align-items: center; }
-  .about-photo-col  { max-width: 230px; }
-  .about-stats      { justify-content: center; }
+  .about-wrapper     { flex-direction: column; align-items: center; }
+  .about-photo-col   { max-width: 230px; }
+  .about-stats       { justify-content: center; }
   .about-content-col { text-align: center; }
-  .about-subtitle   { text-align: center; }
-  .about-text       { text-align: center; }
-  /* Download Resume button centered */
-  .about-content-col .btn-primary {
-    display: block;
-    margin: 0 auto;
-    max-width: 260px;
-    text-align: center;
-  }
+  .about-subtitle    { text-align: center; }
+  .about-text        { text-align: center; }
+  .about-content-col .btn-primary { display: block; margin: 0 auto; max-width: 260px; text-align: center; }
 
   .timeline::before { left: 14px; }
-  .timeline-item { padding-left: 44px; }
-  .timeline-dot  { left: 5px; top: 24px; width: 18px; height: 18px; }
+  .timeline-item    { padding-left: 44px; }
+  .timeline-dot     { left: 5px; top: 24px; width: 18px; height: 18px; }
 
   .exp-header { flex-direction: column; gap: 8px; }
   .exp-period { align-self: flex-start; }
@@ -1488,4 +1461,95 @@ section:nth-child(even) { background-color: var(--section-bg-even); }
   .contact-grid { grid-template-columns: 1fr; max-width: 400px; }
 
   .projects-grid { grid-template-columns: 1fr; }
+
+  /* ============================================
+     MOBILE PROJECT CARDS:
+     Always show buttons below image — no hover needed
+     ============================================ */
+
+  /* Hide the hover-only overlay on mobile */
+  .project-card .project-overlay {
+    display: none;
+  }
+
+  /* Image height slightly reduced */
+  .project-img-wrap {
+    height: 180px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Inject a persistent action bar below the image */
+  .project-card {
+    position: relative;
+  }
+
+  /* Always-visible action strip — sits between image and info */
+  .project-card .project-mobile-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(220,20,60,0.12), rgba(155,89,182,0.12));
+    border-top: 1px solid rgba(220,20,60,0.18);
+    border-bottom: 1px solid rgba(155,89,182,0.12);
+  }
+
+  /* Style the mobile action buttons */
+  .project-card .mob-proj-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    text-decoration: none;
+  }
+  .project-card .mob-proj-btn:active {
+    transform: scale(0.94);
+    background: rgba(220,20,60,0.25);
+    border-color: rgba(220,20,60,0.5);
+  }
+  .project-card .mob-proj-btn.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  /* Light theme adjustments */
+  [data-theme="light"] .project-card .mob-proj-btn {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(192,38,211,0.2);
+    color: var(--text-primary);
+  }
+
+  /* ============================================
+     MOBILE NAV LINK RIPPLE EFFECT
+     ============================================ */
+  @keyframes mobNavRipple {
+    0%   { transform: scale(0);   opacity: 0.55; }
+    60%  { transform: scale(2.2); opacity: 0.25; }
+    100% { transform: scale(3.5); opacity: 0; }
+  }
+  .mob-link-ripple {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220,20,60,0.6) 0%, rgba(155,89,182,0.3) 70%, transparent 100%);
+    pointer-events: none;
+    transform: scale(0);
+    animation: mobNavRipple 0.65s cubic-bezier(0.4,0,0.2,1) forwards;
+    margin-top: -30px;
+    margin-left: -30px;
+    z-index: 0;
+  }
 }
